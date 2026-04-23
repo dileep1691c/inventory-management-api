@@ -52,3 +52,7 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+*.pem
+/.vs/InventoryManagement.slnx
+/.vs/InventoryManagement/CopilotIndices/18.5.39150.21849
