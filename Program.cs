@@ -20,6 +20,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IInventoryManagementService<>), typeof(InventoryManagementService<>));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 

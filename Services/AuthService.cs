@@ -63,7 +63,6 @@ namespace InventoryManagement.Services
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
-            throw new NotImplementedException();
         }
 
         public string GenerateToken(User user)
@@ -74,13 +73,15 @@ namespace InventoryManagement.Services
                 _logger.LogInformation("Not found Private Keys Location");
                 return null;
             }
-            var privateKey = File.ReadAllText(PrimayKeyLocation).ToString()??"";
+            var privateKey = File.ReadAllText(PrimayKeyLocation);
             if(privateKey.Length == 0)
             {
                 _logger.LogInformation("Private Key file is empty");
                 return null;
             }
-            _jwtSettings.SecretKey = privateKey;
+            var rsa = RSA.Create();
+            rsa.ImportFromPem(privateKey);
+            var securityKey = new RsaSecurityKey(rsa);
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
             var claims = new List<Claim>()
@@ -98,7 +99,7 @@ namespace InventoryManagement.Services
                 Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationTime),
                 Issuer = _jwtSettings.Issuer,
                 Audience = _jwtSettings.Audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
