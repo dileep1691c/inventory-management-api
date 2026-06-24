@@ -11,6 +11,9 @@ using System.Text;
 
 namespace InventoryManagement.Services
 {
+    /// <summary>
+    /// Service responsible for handling authentication-related operations, including user authentication, token generation, and refresh token management.
+    /// </summary>
     public class AuthService : IAuthService
     {
         private readonly IUserService _userService;
@@ -18,6 +21,13 @@ namespace InventoryManagement.Services
         private readonly ILogger<AuthService> _logger;
         private readonly IConfiguration _configuration;
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="logger"></param>
+        /// <param name="jwtSettings"></param>
+        /// <param name="configuration"></param>
         public AuthService(IUserService userService, ILogger<AuthService> logger, IOptions<JWTSettings> jwtSettings, IConfiguration configuration) 
         {
             Console.WriteLine(jwtSettings.Value.ToString());
@@ -27,6 +37,11 @@ namespace InventoryManagement.Services
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Authenticates a user based on the provided login request. If authentication is successful, it generates an access token and a refresh token.
+        /// </summary>
+        /// <param name="loginRequest"></param>
+        /// <returns></returns>
         public async Task<AuthResponse> AuthenticateUserAsync(LoginRequest loginRequest)
         {
             var user = await _userService.GetUserByEmail(loginRequest.Email);
@@ -57,6 +72,10 @@ namespace InventoryManagement.Services
             return null;
         }
 
+        /// <summary>
+        /// Generates a secure random refresh token.
+        /// </summary>
+        /// <returns></returns>
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
@@ -65,6 +84,11 @@ namespace InventoryManagement.Services
             return Convert.ToBase64String(randomNumber);
         }
 
+        /// <summary>
+        /// Generates a JWT token for the specified user using RSA encryption.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public string GenerateToken(User user)
         {
             var PrimayKeyLocation = Path.GetFullPath(_configuration.GetSection("PrimayKeyLocation").Value);
@@ -83,7 +107,7 @@ namespace InventoryManagement.Services
             rsa.ImportFromPem(privateKey);
             var securityKey = new RsaSecurityKey(rsa);
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+            //var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
             var claims = new List<Claim>()
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -107,8 +131,6 @@ namespace InventoryManagement.Services
 
             _logger.LogInformation("Access token generated for user {Email}", user.Email);
             return tokenString;
-
-            throw new NotImplementedException();
         }
 
         public Task ValidateRefreshToken(string refreshToken)

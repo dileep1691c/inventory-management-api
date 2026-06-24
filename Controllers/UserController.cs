@@ -1,11 +1,15 @@
 ﻿using InventoryManagement.Models;
 using InventoryManagement.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Controllers
 {
-    //[Route("api/[controller]")]
-    //[ApiController]
+
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
+    
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
@@ -13,6 +17,11 @@ namespace InventoryManagement.Controllers
         {
             _userService = userService;
         }
+
+        /// <summary>
+        /// Gets all the users
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Users")]
         //[Route("/Users")]
         public async Task<ActionResult<IEnumerable<User?>>> Get()
