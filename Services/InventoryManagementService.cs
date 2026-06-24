@@ -2,7 +2,7 @@
 using InventoryManagement.Services.IServices;
 
 namespace InventoryManagement.Services
-{
+{    
     public class InventoryManagementService<T> : IInventoryManagementService<T> where T : class
     {
         private readonly IRepository<T> _repository;
