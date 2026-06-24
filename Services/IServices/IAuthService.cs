@@ -3,6 +3,9 @@ using InventoryManagement.Models;
 
 namespace InventoryManagement.Services.IServices
 {
+    /// <summary>
+    /// Defines the contract for an authentication service that handles user authentication, token generation, and validation of credentials and refresh tokens.
+    /// </summary>
     public interface IAuthService
     {
         /// <summary>

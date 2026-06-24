@@ -1,21 +1,30 @@
 ﻿using InventoryManagement.Models;
+using InventoryManagement.Repository.IRepository;
 using InventoryManagement.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Controllers
 {
-
+    /// <summary>
+    /// Controller responsible for handling user-related operations. It provides endpoints for retrieving user information and managing user data.
+    /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/")]
     [Authorize]
-    
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService) 
+        private readonly IUserRepository _userRepository;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserController"/> class with the specified user service and user repository.
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="userRepository"></param>
+        public UserController(IUserService userService, IUserRepository userRepository) : base(userRepository) 
         {
             _userService = userService;
+            _userRepository = userRepository;
         }
 
         /// <summary>
@@ -23,10 +32,14 @@ namespace InventoryManagement.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("Users")]
-        //[Route("/Users")]
         public async Task<ActionResult<IEnumerable<User?>>> Get()
         {
-            return Ok(await _userService.GetAllAsync());  
+            var user = await GetUserIdFromAccessToken();
+            if (user != null)
+            {
+                return Ok(await _userService.GetAllAsync());
+            }
+            return Unauthorized();
         }
     }
 }
